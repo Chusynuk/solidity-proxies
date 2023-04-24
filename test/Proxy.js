@@ -15,8 +15,8 @@ describe("Proxy", function () {
     const Logic2 = await ethers.getContractFactory("Logic2");
     const logic2 = await Logic2.deploy();
 
-    const proxyAsLogic1 = await ethers.getContractAt(proxy.address, "Logic1");
-    const proxyAsLogic2 = await ethers.getContractAt(proxy.address, "Logic2");
+    const proxyAsLogic1 = await ethers.getContractAt("Logic1", proxy.address);
+    const proxyAsLogic2 = await ethers.getContractAt("Logic2", proxy.address);
 
     return { proxy, logic1, logic2, proxyAsLogic1, proxyAsLogic2 };
   }
@@ -34,12 +34,13 @@ describe("Proxy", function () {
   });
 
   it("Should work with logic2", async function () {
-    const { proxy, logic2 } = await loadFixture(deployFixture);
+    const { proxy, logic2, proxyAsLogic2 } = await loadFixture(deployFixture);
 
     await proxy.changeImplementation(logic2.address);
 
-    await proxy.changeX(99);
+    await proxyAsLogic2.changeX(25);
+    await proxyAsLogic2.tripleX();
 
-    expect(await logic2.x()).to.equal(198);
+    expect(await logic2.x()).to.equal(75);
   });
 });
